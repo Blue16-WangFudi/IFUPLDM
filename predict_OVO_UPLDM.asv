@@ -1,0 +1,28 @@
+function Ypred = predict_OVO_UPLDM(models, Samples_Predict, label_Train)
+   % models: 训练好的模型
+    % Samples_Predict: 测试集特征，大小为MxD，其中M是样本数量，D是特征维度
+    % label_Train: 训练集标签，大小为Nx1，其中N是样本数量
+
+    numClasses = length(unique(label_Train));
+    scores = zeros(size(Samples_Predict, 1), numClasses);
+
+    % 对每个类别对进行预测
+    for i = 1:numClasses
+        for j = i+1:numClasses
+            % 生成二元标签
+            binaryY_train = -1 * ones(size(label_Train));
+            binaryY_train( label_Train == i) = 1;
+            binaryY_train(label_Train == j) = -1;
+
+            % 预测得分
+            pred_scores = Predict_UPLDM(models{i,j}, Samples_Predict);
+
+            % 累加分数
+            scores(:, i) = scores(:, i) + (pred_scores>=0);
+            scores(:, j) = scores(:, j) + (pred_scores<0);
+        end
+    end
+
+    % 找到分数最高的类别
+    [~, Ypred] = max(scores, [], 2);
+end

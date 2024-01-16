@@ -1,0 +1,26 @@
+function model = OVO_UPLDM(X_train, Y_train, lambda1, lambda2, tau, C)
+    numClasses = length(unique(Y_train)); % Get class count
+    models = cell(numClasses, numClasses);
+    Kernel = 'Linear'; % You can choose the kernel type
+    
+    modelIndex = 1;
+    
+    % Iterate over each pair of classes
+    for i = 1:numClasses
+        for j = i+1:numClasses
+            idx = Y == classes(i) | Y == classes(j);
+            binaryY = Y(idx);
+            binaryY(binaryY == classes(i)) = -1;
+            binaryY(binaryY == classes(j)) = 1;
+            binaryX = X(idx, :);
+
+            % Train UPLDM model for the pair
+            s = TC_IF(X_train, binaryY_train, Kernel);
+            models{modelIndex} = Train_UPLDM(X_train, binaryY_train, lambda1, lambda2, tau, C*s, Kernel);
+            
+            modelIndex = modelIndex + 1;
+        end
+    end
+    model.models = models;
+    model.numClasses = numClasses;
+end

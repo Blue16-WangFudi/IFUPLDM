@@ -1,0 +1,20 @@
+function [batchS_P , batchT_P]=DRCA(batchS , batchT ,lambda , d)
+    batchS=batchS./repmat(sqrt(sum(batchS.^2,1)),size(batchS,1),1);
+    batchT=batchT./repmat(sqrt(sum(batchT.^2,1)),size(batchT,1),1);
+    MbatchS=mean(batchS);
+    MbatchT=mean(batchT);
+    Ms=MbatchS';
+    Mt=MbatchT';
+    batchS=batchS';
+    batchT=batchT';
+    dim=size(batchS,1);
+    A=zeros(dim,dim);
+    A=A+pinv((Ms-Mt)*(Ms-Mt)')*(batchS*batchS'+lambda*batchT*batchT');
+    [eigenvector,eigenvalue]=eig(A);
+    [neweigenvalue,Idex] = sort(diag(eigenvalue),'descend');
+    neweigenvalue=diag(neweigenvalue);
+    neweigenvector=eigenvector(:,Idex);
+    P = neweigenvector(:,1:d);
+    batchS_P=batchS'*P;
+    batchT_P=batchT'*P;
+end
